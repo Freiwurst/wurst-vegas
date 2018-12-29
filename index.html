@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Wurst Vegas</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="dist/jquery.slotmachine.css" type="text/css" media="screen" />
+  </head>
+  <body>
+    <div id="casino" style="height: 480px;">
+      <div class="container mx-auto mt-5" style="width: 640px;">
+        <div id="casino1" class="slotMachine">
+          <div class="slot slot1"></div>
+          <div class="slot slot2"></div>
+          <div class="slot slot3"></div>
+          <div class="slot slot4"></div>
+          <div class="slot slot5"></div>
+          <div class="slot slot6"></div>
+        </div>
+
+        <div id="casino2" class="slotMachine">
+          <div class="slot slot1"></div>
+          <div class="slot slot2"></div>
+          <div class="slot slot3"></div>
+          <div class="slot slot4"></div>
+          <div class="slot slot5"></div>
+          <div class="slot slot6"></div>
+        </div>
+
+        <div id="casino3" class="slotMachine">
+          <div class="slot slot1"></div>
+          <div class="slot slot2"></div>
+          <div class="slot slot3"></div>
+          <div class="slot slot4"></div>
+          <div class="slot slot5"></div>
+          <div class="slot slot6"></div>
+        </div>
+      </div>
+      <div class="container mx-auto" style="width: 640px;">
+        <div id="slotMachineButtonShuffle" type="button" class="btn btn-danger btn-lg btn-circle" style="width: 150px; height: 150px;">Start</div>
+        <div id="slotMachineButtonStop" type="button" class="btn btn-primary btn-lg" style="width: 200px; height: 150px;">Reload</div>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="dist/jquery.slotmachine.js"></script>
+    <script>
+      $(document).ready(function(){
+        var machine4 = $("#casino1").slotMachine({
+          active  : 0,
+          delay : 500,
+          randomize: good_randomness
+        });
+
+        var machine5 = $("#casino2").slotMachine({
+          active  : 1,
+          delay : 500,
+          randomize: good_randomness
+        });
+
+        machine6 = $("#casino3").slotMachine({
+          active  : 3,
+          delay : 500,
+          randomize: good_randomness
+        });
+
+        var started = 0;
+
+        $("#slotMachineButtonShuffle").click(function(){
+          started = 3;
+          machine4.shuffle(3, stop_callback);
+          machine5.shuffle(8, stop_callback);
+          machine6.shuffle(13, stop_callback);
+        });
+
+        $("#slotMachineButtonStop").click(function(){
+          location.reload();
+        });
+
+        function stop_callback() {
+          started--;
+          if (started == 0) {
+            if (machine4.active == 0) {
+              if (machine5.active == 0) {
+                if (machine6.active == 0) {
+                  win();
+                }
+              }
+            }
+            if (machine4.active == 5) {
+              if (machine5.active == 5) {
+                if (machine6.active == 5) {
+                  // jackpot
+                  win();
+                  win();
+                  win();
+                }
+              }
+            }
+          }
+        };
+
+        function good_randomness(active_idx) {
+          r = Math.random();
+          if (r < 0.5) {
+            return 0; // wurst
+          }
+          if (r < 0.65) {
+            return 5; // wurst enterprise
+          }
+          if (r < 0.71) {
+            return 1;
+          }
+          if (r < 0.86) {
+            return 3;
+          }
+          return 4;
+          // never show 2
+        };
+
+        function win() {
+          $.get("http://127.0.0.1:8080/win");  // points to the wurst rest api
+          setTimeout(function(){ $("#casino").css('border-color', '#ffb400') }, 0);
+          setTimeout(function(){ $("#casino").css('background-color', '#dc0067') }, 0);
+          setTimeout(function(){ $("#casino").css('border-color', '#dc0067') }, 500);
+          setTimeout(function(){ $("#casino").css('background-color', '#ffb400') }, 500);
+          setTimeout(function(){ $("#casino").css('border-color', '#ffb400') }, 1000);
+          setTimeout(function(){ $("#casino").css('background-color', '#dc0067') }, 1000);
+          setTimeout(function(){ $("#casino").css('border-color', '#dc0067') }, 1500);
+          setTimeout(function(){ $("#casino").css('background-color', '#ffb400') }, 1500);
+          setTimeout(function(){ $("#casino").css('border-color', '#ffb400') }, 2000);
+          setTimeout(function(){ $("#casino").css('background-color', '#dc0067') }, 2000);
+          setTimeout(function(){ $("#casino").css('border-color', '#dc0067') }, 2500);
+          setTimeout(function(){ $("#casino").css('background-color', '#ffb400') }, 2500);
+        };
+
+        function sleep(milliseconds) {
+          var start = new Date().getTime();
+          for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds){
+              break;
+            }
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
